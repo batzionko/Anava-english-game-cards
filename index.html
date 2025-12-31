@@ -2,56 +2,45 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>English Magic Game ✨</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>English Magic ✨</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #fdf2f8; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; overflow: hidden; }
-        
-        /* מונה מילים */
-        .counter { font-size: 22px; color: #db2777; margin-bottom: 15px; font-weight: bold; background: white; padding: 5px 20px; border-radius: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-
-        /* הכרטיס המרכזי */
-        .card { width: 340px; height: 420px; background: white; border-radius: 40px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); display: flex; flex-direction: column; align-items: center; justify-content: center; border: 10px solid #fbcfe8; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; }
-        .listening-active { border-color: #60a5fa !important; box-shadow: 0 0 40px rgba(59, 130, 246, 0.6); transform: scale(1.02); }
-        
-        .emoji { font-size: 110px; margin-bottom: 15px; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.1)); }
-        .en-word { font-size: 34px; font-weight: 900; color: #be185d; direction: ltr; text-align: center; line-height: 1.2; padding: 0 15px; }
-        
-        .transcript-display { margin-top: 20px; height: 30px; color: #3b82f6; font-weight: bold; font-size: 20px; text-align: center; width: 90%; }
-        .status-light { width: 45px; height: 45px; border-radius: 50%; background: #e5e7eb; margin-top: 20px; border: 4px solid white; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
-
-        /* אזור הכפתורים */
-        .controls { margin-top: 40px; display: flex; gap: 25px; align-items: center; direction: ltr; }
-
-        /* עיצוב כפתורים כללי */
-        .btn { border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; position: relative; outline: none; -webkit-tap-highlight-color: transparent; }
-        .btn:active { transform: translateY(6px); box-shadow: none !important; }
-
-        /* כפתורי חיצים */
-        .nav-btn { width: 80px; height: 80px; background: #f472b6; color: white; border-radius: 25px; font-size: 35px; box-shadow: 0 8px 0 #db2777; }
-        
-        /* כפתור מיקרופון ענק */
-        .mic-btn { width: 110px; height: 110px; background: #3b82f6; color: white; border-radius: 50%; font-size: 50px; box-shadow: 0 10px 0 #1d4ed8; }
-        .mic-btn.is-listening { background: #fbbf24; box-shadow: 0 10px 0 #d97706; animation: pulse 1.2s infinite; }
-
-        @keyframes pulse { 0% { transform: scale(1); box-shadow: 0 10px 0 #d97706, 0 0 0 0px rgba(251, 191, 36, 0.7); } 70% { transform: scale(1.05); box-shadow: 0 10px 0 #d97706, 0 0 0 20px rgba(251, 191, 36, 0); } 100% { transform: scale(1); box-shadow: 0 10px 0 #d97706, 0 0 0 0px rgba(251, 191, 36, 0); } }
+        body { font-family: 'Segoe UI', sans-serif; background: #fdf2f8; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 100vh; margin: 0; overflow: hidden; padding-top: 15px; box-sizing: border-box; }
+        #start-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ff4081; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; }
+        .counter { font-size: 18px; color: #ad1457; margin-bottom: 8px; font-weight: bold; }
+        .card { width: 300px; height: 360px; background: white; border-radius: 40px; box-shadow: 0 15px 30px rgba(0,0,0,0.1); display: flex; flex-direction: column; align-items: center; justify-content: center; border: 10px solid #fbcfe8; transition: all 0.4s; position: relative; }
+        .listening-active { border-color: #3b82f6 !important; box-shadow: 0 0 25px rgba(59, 130, 246, 0.6); }
+        .emoji { font-size: 85px; margin-bottom: 10px; }
+        .en-word { font-size: 26px; font-weight: 900; color: #be185d; direction: ltr; text-align: center; padding: 0 10px; }
+        .transcript { margin-top: 10px; color: #3b82f6; font-weight: bold; min-height: 24px; font-size: 18px; }
+        .controls { margin-top: 20px; display: flex; gap: 15px; align-items: center; direction: ltr; margin-bottom: 15px; }
+        .btn { border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; box-shadow: 0 6px 0 #db2777; border-radius: 20px; outline: none; }
+        .btn:active { transform: translateY(4px); box-shadow: none; }
+        .nav-btn { width: 65px; height: 65px; background: #f472b6; font-size: 35px; }
+        .mic-btn { width: 85px; height: 85px; background: #3b82f6; border-radius: 50%; font-size: 40px; box-shadow: 0 8px 0 #1d4ed8; }
+        .mic-btn.is-listening { background: #fbbf24; box-shadow: 0 8px 0 #d97706; animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
     </style>
 </head>
 <body>
 
-    <div class="counter" id="counter">1 / 40</div>
+    <div id="start-overlay">
+        <h1 style="font-size: 40px; margin-bottom: 20px;">מוכנות? 🎈</h1>
+        <button class="btn" style="padding: 20px 50px; font-size: 25px; background: white; color: #ff4081; box-shadow: 0 6px 0 #ad1457;" onclick="startGame()">לחצו להתחלה!</button>
+    </div>
+
+    <div class="counter" id="counter">1 / 42</div>
 
     <div class="card" id="main-card">
         <div class="emoji" id="display-emoji">👋</div>
         <div class="en-word" id="display-en">Welcome</div>
-        <div class="transcript-display" id="transcript-text">מוכנה?</div>
-        <div id="status" class="status-light"></div>
+        <div class="transcript" id="transcript-text"></div>
     </div>
 
     <div class="controls">
         <button class="btn nav-btn" onclick="prevWord()">⬅️</button>
-        <button id="mic-button" class="btn mic-btn" onclick="startListening()">🎤</button>
+        <button id="mic-button" class="btn mic-btn" onclick="toggleMic()">🎤</button>
         <button class="btn nav-btn" onclick="nextWord()">➡️</button>
     </div>
 
@@ -61,133 +50,123 @@
             { en: 'Thank you', icon: '🙏' }, { en: "What's your name?", icon: '❓' }, { en: 'My name is', icon: '🆔' },
             { en: 'Sunday', icon: '📅' }, { en: 'Yes', icon: '✅' }, { en: 'No', icon: '❌' },
             { en: 'OK', icon: '🆗' }, { en: 'Goodbye', icon: '👋' }, { en: 'How are you today?', icon: '💖' },
-            { en: "Thank you I'm Ok", icon: '👍' }, { en: 'I love you', icon: '🤟' }, { en: 'Colors', icon: '🎨' },
-            { en: 'Red', icon: '♥️' }, { en: 'Green', icon: '💚' }, { en: 'Pink', icon: '💗' },
-            { en: 'Blue', icon: '💙' }, { en: 'Light blue', icon: '🩵' }, { en: 'Orange', icon: '🧡' },
-            { en: 'Gray', icon: '🔘' }, { en: 'Brown', icon: '🤎' }, { en: 'Purple', icon: '💜' },
-            { en: 'White', icon: '🤍' }, { en: 'Black', icon: '🖤' }, { en: 'Animals', icon: '🦁' },
-            { en: 'Cat', icon: '🐈' }, { en: 'Dog', icon: '🐕' }, { en: 'Monkey', icon: '🐒' },
-            { en: 'Frog', icon: '🐸' }, { en: 'Snake', icon: '🐍' }, { en: 'Rabbit', icon: '🐰' },
-            { en: 'Cow', icon: '🐄' }, { en: 'Fish', icon: '🐟' }, { en: 'Shark', icon: '🦈' },
-            { en: 'Dreidel', icon: '🕎' }, { en: 'Dance', icon: '💃' }, { en: 'Jump', icon: '🦘' },
-            { en: 'Stop', icon: '🛑' }, { en: 'Party', icon: '🎉' }, { en: 'Light', icon: '💡' }
+            { en: "Thank you I'm Ok", icon: '👍' }, { en: 'I love you', icon: '🤟' }, { en: 'Red', icon: '♥️' },
+            { en: 'Green', icon: '💚' }, { en: 'Pink', icon: '💗' }, { en: 'Blue', icon: '💙' },
+            { en: 'Light blue', icon: '🩵' }, { en: 'Orange', icon: '🧡' }, { en: 'Gray', icon: '🔘' },
+            { en: 'Brown', icon: '🤎' }, { en: 'Purple', icon: '💜' }, { en: 'White', icon: '🤍' },
+            { en: 'Black', icon: '🖤' }, { en: 'Cat', icon: '🐈' }, { en: 'Dog', icon: '🐕' },
+            { en: 'Monkey', icon: '🐒' }, { en: 'Frog', icon: '🐸' }, { en: 'Snake', icon: '🐍' },
+            { en: 'Rabbit', icon: '🐰' }, { en: 'Cow', icon: '🐄' }, { en: 'Fish', icon: '🐟' },
+            { en: 'Shark', icon: '🦈' }, { en: 'Dreidel', icon: '🕎' }, { en: 'Dance', icon: '💃' },
+            { en: 'Jump', icon: '🦘' }, { en: 'Stop', icon: '🛑' }, { en: 'Party', icon: '🎉' }, { en: 'Light', icon: '💡' }
         ];
 
         let currentIndex = 0;
         let isProcessing = false;
-        let micTimeout;
         let hasSucceeded = false;
+        let recognition;
 
+        // אתחול מנוע זיהוי הדיבור
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        const recognition = new SpeechRecognition();
-        recognition.lang = 'en-US';
-        recognition.interimResults = true;
-        recognition.continuous = true;
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.lang = 'en-US';
+            recognition.interimResults = true;
+            recognition.continuous = true;
+
+            recognition.onstart = () => {
+                isProcessing = true;
+                document.getElementById('mic-button').classList.add('is-listening');
+                document.getElementById('main-card').classList.add('listening-active');
+            };
+
+            recognition.onresult = (event) => {
+                if (hasSucceeded) return;
+                let result = "";
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    result += event.results[i][0].transcript;
+                }
+                result = result.toLowerCase().trim();
+                document.getElementById('transcript-text').innerText = result;
+                
+                const target = words[currentIndex].en.toLowerCase().replace(/[?.,!]/g, "");
+                if (result.includes(target)) {
+                    hasSucceeded = true;
+                    recognition.stop();
+                    handleSuccess();
+                }
+            };
+
+            recognition.onend = () => {
+                isProcessing = false;
+                document.getElementById('mic-button').classList.remove('is-listening');
+                document.getElementById('main-card').classList.remove('listening-active');
+            };
+        }
+
+        function startGame() {
+            document.getElementById('start-overlay').style.display = 'none';
+            updateCard();
+        }
 
         function updateCard() {
             hasSucceeded = false;
+            window.speechSynthesis.cancel();
+            if (isProcessing) recognition.stop();
+            
             const item = words[currentIndex];
             document.getElementById('display-emoji').innerText = item.icon;
             document.getElementById('display-en').innerText = item.en;
             document.getElementById('counter').innerText = `${currentIndex + 1} / ${words.length}`;
-            document.getElementById('status').style.backgroundColor = '#e5e7eb';
-            document.getElementById('transcript-text').innerText = "לחצי על המיקרופון";
-            document.getElementById('transcript-text').style.color = "#3b82f6";
-            speak(item.en);
+            document.getElementById('transcript-text').innerText = "";
+            
+            setTimeout(() => speak(item.en), 300);
+        }
+
+        function toggleMic() {
+            if (isProcessing) recognition.stop();
+            else startListening();
         }
 
         function startListening() {
-            if (isProcessing) return;
+            if (!recognition || isProcessing) return;
             hasSucceeded = false;
             try {
                 recognition.start();
-                clearTimeout(micTimeout);
-                micTimeout = setTimeout(() => {
-                    if (isProcessing && !hasSucceeded) {
-                        recognition.stop();
-                        handleTimeout();
-                    }
-                }, 10000);
-            } catch (e) {}
+            } catch(e) { console.log("Recognition error:", e); }
         }
-
-        recognition.onstart = () => {
-            isProcessing = true;
-            document.getElementById('mic-button').classList.add('is-listening');
-            document.getElementById('main-card').classList.add('listening-active');
-            document.getElementById('transcript-text').innerText = "אני מקשיבה...";
-        };
-
-        recognition.onresult = (event) => {
-            if (hasSucceeded) return;
-            let result = "";
-            for (let i = event.resultIndex; i < event.results.length; ++i) {
-                result += event.results[i][0].transcript;
-            }
-            result = result.toLowerCase().trim();
-            document.getElementById('transcript-text').innerText = `שמעתי: ${result}`;
-            
-            const target = words[currentIndex].en.toLowerCase().replace(/[?.,!]/g, "");
-            if (result.includes(target)) {
-                hasSucceeded = true;
-                clearTimeout(micTimeout);
-                recognition.stop();
-                handleSuccess();
-            }
-        };
-
-        function handleTimeout() {
-            if (hasSucceeded) return;
-            stopUI();
-            document.getElementById('transcript-text').innerText = "לא שמעתי, נסי שוב";
-            document.getElementById('transcript-text').style.color = "#f59e0b";
-        }
-
-        function stopUI() {
-            isProcessing = false;
-            document.getElementById('mic-button').classList.remove('is-listening');
-            document.getElementById('main-card').classList.remove('listening-active');
-        }
-
-        recognition.onend = () => stopUI();
 
         function handleSuccess() {
-            document.getElementById('status').style.backgroundColor = '#10b981';
-            document.getElementById('transcript-text').innerText = "נכון מאוד! ✨";
-            document.getElementById('transcript-text').style.color = "#10b981";
             confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-            playSuccessSound();
-            setTimeout(nextWord, 2500);
+            playWinSound();
+            setTimeout(nextWord, 2000);
         }
 
-        function playSuccessSound() {
+        function playWinSound() {
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const notes = [523.25, 659.25, 783.99, 1046.50];
-            notes.forEach((freq, i) => {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.frequency.setValueAtTime(freq, audioCtx.currentTime + i * 0.1);
-                gain.gain.setValueAtTime(0.1, audioCtx.currentTime + i * 0.1);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.1 + 0.3);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start(audioCtx.currentTime + i * 0.1);
-                osc.stop(audioCtx.currentTime + i * 0.1 + 0.4);
+            [523, 659, 783, 1046].forEach((f, i) => {
+                const o = audioCtx.createOscillator();
+                const g = audioCtx.createGain();
+                o.frequency.setValueAtTime(f, audioCtx.currentTime + i * 0.1);
+                g.gain.setValueAtTime(0.1, audioCtx.currentTime + i * 0.1);
+                o.connect(g); g.connect(audioCtx.destination);
+                o.start(audioCtx.currentTime + i * 0.1); o.stop(audioCtx.currentTime + i * 0.1 + 0.3);
             });
         }
 
         function speak(text) {
-            window.speechSynthesis.cancel();
             const u = new SpeechSynthesisUtterance(text);
             u.lang = 'en-US';
             u.rate = 0.8;
+            u.onend = () => {
+                // השהיה של 500 מילישניות לפני שפותחים מיקרופון כדי למנוע קריסה בטלפון
+                setTimeout(startListening, 500);
+            };
             window.speechSynthesis.speak(u);
         }
 
         function nextWord() { currentIndex = (currentIndex + 1) % words.length; updateCard(); }
         function prevWord() { currentIndex = (currentIndex - 1 + words.length) % words.length; updateCard(); }
-
-        updateCard();
     </script>
 </body>
 </html>
