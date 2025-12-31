@@ -8,18 +8,14 @@
     <style>
         :root { --pink: #fdf2f8; --dark-pink: #be185d; --blue: #3b82f6; --purple: #a855f7; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--pink); display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 100vh; margin: 0; overflow: hidden; box-sizing: border-box; }
-        
         #menu-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; height: 100vh; width: 100%; background: linear-gradient(180deg, #fdf2f8 0%, #fae8ff 100%); }
         .menu-title { font-size: 45px; color: var(--dark-pink); margin: 0; text-shadow: 3px 3px 0px white; animation: float 3s ease-in-out infinite; }
-        
         .menu-btn { width: 300px; height: 130px; border-radius: 60px; border: none; font-size: 26px; font-weight: 900; cursor: pointer; color: white; transition: 0.3s; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.2; text-align: center; padding: 10px; }
         .btn-game-1 { background: var(--blue); box-shadow: 0 12px 0 #1d4ed8; }
         .btn-game-2 { background: var(--purple); box-shadow: 0 12px 0 #7e22ce; }
         .menu-btn:active { transform: translateY(8px); box-shadow: none; }
         .btn-subtext { font-size: 18px; font-weight: bold; background: rgba(255,255,255,0.2); padding: 2px 15px; border-radius: 15px; margin-top: 8px; }
-
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-
         #game-screen { display: none; flex-direction: column; align-items: center; width: 100%; padding-top: 20px; }
         .counter { font-size: 18px; color: #ad1457; margin-bottom: 8px; font-weight: bold; background: white; padding: 5px 15px; border-radius: 20px; }
         .card { width: 310px; height: 370px; background: white; border-radius: 40px; box-shadow: 0 15px 35px rgba(0,0,0,0.15); display: flex; flex-direction: column; align-items: center; justify-content: center; border: 12px solid #fbcfe8; position: relative; }
@@ -28,13 +24,11 @@
         .en-word { font-size: 28px; font-weight: 900; color: var(--dark-pink); direction: ltr; text-align: center; width: 90%; }
         .instruction { font-size: 20px; color: #666; margin-bottom: 5px; font-weight: bold; }
         .transcript { margin-top: 15px; color: var(--blue); font-weight: bold; min-height: 24px; font-size: 20px; }
-        
         .controls { margin-top: 25px; display: flex; gap: 20px; align-items: center; direction: ltr; }
         .nav-btn { width: 70px; height: 70px; background: #f472b6; font-size: 35px; border-radius: 25px; box-shadow: 0 8px 0 #db2777; border: none; cursor: pointer; color: white; }
         .mic-btn { width: 95px; height: 95px; background: var(--blue); border-radius: 50%; font-size: 45px; box-shadow: 0 10px 0 #1d4ed8; border: none; cursor: pointer; color: white; }
         .mic-btn.is-listening { background: #fbbf24; box-shadow: 0 10px 0 #d97706; animation: pulse 1s infinite; }
         .home-btn { position: absolute; top: 15px; right: 15px; background: white; width: 50px; height: 50px; font-size: 25px; border-radius: 15px; box-shadow: 0 4px 0 #ddd; border: none; cursor: pointer; }
-
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.08); } 100% { transform: scale(1); } }
     </style>
 </head>
@@ -70,48 +64,27 @@
 
     <script>
         const words = [
-            { en: 'Welcome', hb: 'ברוכים הבאים', icon: '👋' },
-            { en: 'Hello', hb: 'שלום', icon: '😊' },
-            { en: 'Good afternoon', hb: 'צהריים טובים', icon: '☀️' },
-            { en: 'Thank you', hb: 'תודה', icon: '🙏' },
-            { en: "What's your name?", hb: 'מה השם שלך', icon: '❓' },
-            { en: 'My name is', hb: 'השם שלי', icon: '🆔' },
-            { en: 'Sunday', hb: 'יום ראשון', icon: '📅' },
-            { en: 'Yes', hb: 'כן', icon: '✅' },
-            { en: 'No', hb: 'לא', icon: '❌' },
-            { en: 'OK', hb: 'אוקיי', icon: '🆗' },
-            { en: 'Goodbye', hb: 'להתראות', icon: '👋' },
-            { en: 'How are you today?', hb: 'מה שלומך היום', icon: '💖' },
-            { en: "Thank you I'm Ok", hb: 'תודה אני בסדר', icon: '👍' },
-            { en: 'I love you', hb: 'אני אוהב אותך', icon: '🤟' },
-            { en: 'Red', hb: 'אדום', icon: '🔴' },
-            { en: 'Green', hb: 'ירוק', icon: '🟢' },
-            { en: 'Pink', hb: 'ורוד', icon: '💗' },
-            { en: 'Blue', hb: 'כחול', icon: '🔵' },
-            { en: 'Light blue', hb: 'תכלת', icon: '🩵' },
-            { en: 'Orange', hb: 'כתום', icon: '🧡' },
-            { en: 'Gray', hb: 'אפור', icon: '🔘' },
-            { en: 'Brown', hb: 'חום', icon: '🤎' },
-            { en: 'Purple', hb: 'סגול', icon: '💜' },
-            { en: 'White', hb: 'לבן', icon: '🤍' },
-            { en: 'Black', hb: 'שחור', icon: '🖤' },
-            { en: 'Cat', hb: 'חתול', icon: '🐈' },
-            { en: 'Dog', hb: 'כלב', icon: '🐕' },
-            { en: 'Monkey', hb: 'קוף', icon: '🐒' },
-            { en: 'Frog', hb: 'צפרדע', icon: '🐸' },
-            { en: 'Snake', hb: 'נחש', icon: '🐍' },
-            { en: 'Rabbit', hb: 'ארנב', icon: '🐰' },
-            { en: 'Cow', hb: 'פרה', icon: '🐄' },
-            { en: 'Fish', hb: 'דג', icon: '🐟' },
-            { en: 'Shark', hb: 'כריש', icon: '🦈' },
-            { en: 'Dreidel', hb: 'סביבון', icon: '🕎' },
-            { en: 'Dance', hb: 'לרקוד', icon: '💃' },
-            { en: 'Jump', hb: 'לקפוץ', icon: '🦘' },
-            { en: 'Stop', hb: 'לעצור', icon: '🛑' },
-            { en: 'Party', hb: 'מסיבה', icon: '🎉' },
-            { en: 'Light', hb: 'אור', icon: '💡' },
-            { en: 'Happy birthday', hb: 'יום הולדת שמח', icon: '🎂' },
-            { en: 'Good morning', hb: 'בוקר טוב', icon: '🌅' }
+            { en: 'Welcome', hb: 'ברוכים הבאים', icon: '👋' }, { en: 'Hello', hb: 'שלום', icon: '😊' },
+            { en: 'Good afternoon', hb: 'צהריים טובים', icon: '☀️' }, { en: 'Thank you', hb: 'תודה', icon: '🙏' },
+            { en: "What's your name?", hb: 'מה השם שלך', icon: '❓' }, { en: 'My name is', hb: 'השם שלי', icon: '🆔' },
+            { en: 'Sunday', hb: 'יום ראשון', icon: '📅' }, { en: 'Yes', hb: 'כן', icon: '✅' },
+            { en: 'No', hb: 'לא', icon: '❌' }, { en: 'OK', hb: 'אוקיי', icon: '🆗' },
+            { en: 'Goodbye', hb: 'להתראות', icon: '👋' }, { en: 'How are you today?', hb: 'מה שלומך היום', icon: '💖' },
+            { en: "Thank you I'm Ok", hb: 'תודה אני בסדר', icon: '👍' }, { en: 'I love you', hb: 'אני אוהב אותך', icon: '🤟' },
+            { en: 'Red', hb: 'אדום', icon: '🔴' }, { en: 'Green', hb: 'ירוק', icon: '🟢' },
+            { en: 'Pink', hb: 'ורוד', icon: '💗' }, { en: 'Blue', hb: 'כחול', icon: '🔵' },
+            { en: 'Light blue', hb: 'תכלת', icon: '🩵' }, { en: 'Orange', hb: 'כתום', icon: '🧡' },
+            { en: 'Gray', hb: 'אפור', icon: '🔘' }, { en: 'Brown', hb: 'חום', icon: '🤎' },
+            { en: 'Purple', hb: 'סגול', icon: '💜' }, { en: 'White', hb: 'לבן', icon: '🤍' },
+            { en: 'Black', hb: 'שחור', icon: '🖤' }, { en: 'Cat', hb: 'חתול', icon: '🐈' },
+            { en: 'Dog', hb: 'כלב', icon: '🐕' }, { en: 'Monkey', hb: 'קוף', icon: '🐒' },
+            { en: 'Frog', hb: 'צפרדע', icon: '🐸' }, { en: 'Snake', hb: 'נחש', icon: '🐍' },
+            { en: 'Rabbit', hb: 'ארנב', icon: '🐰' }, { en: 'Cow', hb: 'פרה', icon: '🐄' },
+            { en: 'Fish', hb: 'דג', icon: '🐟' }, { en: 'Shark', hb: 'כריש', icon: '🦈' },
+            { en: 'Dreidel', hb: 'סביבון', icon: '🕎' }, { en: 'Dance', hb: 'לרקוד', icon: '💃' },
+            { en: 'Jump', hb: 'לקפוץ', icon: '🦘' }, { en: 'Stop', hb: 'לעצור', icon: '🛑' },
+            { en: 'Party', hb: 'מסיבה', icon: '🎉' }, { en: 'Light', hb: 'אור', icon: '💡' },
+            { en: 'Happy birthday', hb: 'יום הולדת שמח', icon: '🎂' }, { en: 'Good morning', hb: 'בוקר טוב', icon: '🌅' }
         ];
 
         let currentIndex = 0;
@@ -119,17 +92,26 @@
         let isProcessing = false;
         let hasSucceeded = false;
         let recognition;
+        let retryTimer;
 
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (SpeechRecognition) {
             recognition = new SpeechRecognition();
             recognition.interimResults = true;
-            recognition.continuous = true;
+            recognition.continuous = false; // עדיף false כדי לזהות סוף משפט מהר יותר
 
             recognition.onstart = () => {
                 isProcessing = true;
                 document.getElementById('mic-button').classList.add('is-listening');
                 document.getElementById('main-card').classList.add('listening-active');
+                clearTimeout(retryTimer);
+                // אם עברו 10 שניות ועדיין מקשיב - להגיד שוב
+                retryTimer = setTimeout(() => {
+                    if (isProcessing && !hasSucceeded) {
+                        recognition.stop();
+                        updateCard(); // זה יגיד את המילה שוב ויפתח מיקרופון
+                    }
+                }, 10000);
             };
 
             recognition.onresult = (event) => {
@@ -145,6 +127,7 @@
                 
                 if (result.includes(target)) {
                     hasSucceeded = true;
+                    clearTimeout(retryTimer);
                     recognition.stop();
                     handleSuccess();
                 }
@@ -154,6 +137,10 @@
                 isProcessing = false;
                 document.getElementById('mic-button').classList.remove('is-listening');
                 document.getElementById('main-card').classList.remove('listening-active');
+                // ה"קסם": אם לא הצלחנו והמיקרופון נסגר לבד - לפתוח שוב מיד!
+                if (!hasSucceeded && document.getElementById('game-screen').style.display === 'flex') {
+                    setTimeout(startListening, 300);
+                }
             };
         }
 
@@ -173,7 +160,9 @@
         }
 
         function goToMenu() {
+            hasSucceeded = true; // עוצר לופים
             window.speechSynthesis.cancel();
+            clearTimeout(retryTimer);
             if(isProcessing) recognition.stop();
             document.getElementById('game-screen').style.display = 'none';
             document.getElementById('menu-screen').style.display = 'flex';
@@ -182,7 +171,6 @@
         function updateCard() {
             hasSucceeded = false;
             window.speechSynthesis.cancel();
-            if (isProcessing) recognition.stop();
             
             const item = words[currentIndex];
             document.getElementById('display-emoji').innerText = item.icon;
@@ -195,7 +183,7 @@
                 const u = new SpeechSynthesisUtterance(textToSay);
                 u.lang = 'en-US';
                 u.rate = 0.8;
-                u.onend = () => setTimeout(startListening, 600);
+                u.onend = () => setTimeout(startListening, 500);
                 window.speechSynthesis.speak(u);
             }, 300);
         }
@@ -206,8 +194,7 @@
         }
 
         function startListening() {
-            if (!recognition || isProcessing) return;
-            hasSucceeded = false;
+            if (!recognition || isProcessing || hasSucceeded) return;
             try { recognition.start(); } catch(e) {}
         }
 
