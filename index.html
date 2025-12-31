@@ -17,7 +17,9 @@
         .btn-subtext { font-size: 18px; font-weight: bold; background: rgba(255,255,255,0.2); padding: 2px 15px; border-radius: 15px; margin-top: 8px; }
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
         #game-screen { display: none; flex-direction: column; align-items: center; width: 100%; padding-top: 20px; }
-        .counter { font-size: 18px; color: #ad1457; margin-bottom: 8px; font-weight: bold; background: white; padding: 5px 15px; border-radius: 20px; }
+        .counter-container { display: flex; gap: 10px; margin-bottom: 8px; }
+        .counter { font-size: 18px; color: #ad1457; font-weight: bold; background: white; padding: 5px 15px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .success-streak { background: #dcfce7; color: #166534; }
         .card { width: 310px; height: 370px; background: white; border-radius: 40px; box-shadow: 0 15px 35px rgba(0,0,0,0.15); display: flex; flex-direction: column; align-items: center; justify-content: center; border: 12px solid #fbcfe8; position: relative; }
         .listening-active { border-color: #fbbf24 !important; box-shadow: 0 0 30px rgba(251, 191, 36, 0.7); }
         .emoji { font-size: 85px; margin-bottom: 10px; }
@@ -36,11 +38,11 @@
 
     <div id="menu-screen">
         <h1 class="menu-title">קסם האנגלית ✨</h1>
-        <button class="menu-btn btn-game-1" onclick="startApp(1)">
+        <button class="menu-btn btn-game-1" onclick="initAudio(); startApp(1)">
             דברי באנגלית 🎤
             <span class="btn-subtext">תחזרו אחריי!</span>
         </button>
-        <button class="menu-btn btn-game-2" onclick="startApp(2)">
+        <button class="menu-btn btn-game-2" onclick="initAudio(); startApp(2)">
             תרגום לעברית 🧠
             <span class="btn-subtext">איך אומרים?</span>
         </button>
@@ -48,7 +50,10 @@
 
     <div id="game-screen">
         <button class="home-btn" onclick="goToMenu()">🏠</button>
-        <div class="counter" id="counter">1 / 42</div>
+        <div class="counter-container">
+            <div class="counter" id="counter">1 / 42</div>
+            <div class="counter success-streak" id="streak-counter">הצלחות: 0</div>
+        </div>
         <div class="card" id="main-card">
             <div id="game-instruction" class="instruction"></div>
             <div class="emoji" id="display-emoji">👋</div>
@@ -81,37 +86,56 @@
             { en: 'Frog', hb: 'צפרדע', icon: '🐸' }, { en: 'Snake', hb: 'נחש', icon: '🐍' },
             { en: 'Rabbit', hb: 'ארנב', icon: '🐰' }, { en: 'Cow', hb: 'פרה', icon: '🐄' },
             { en: 'Fish', hb: 'דג', icon: '🐟' }, { en: 'Shark', hb: 'כריש', icon: '🦈' },
-            { en: 'Dreidel', hb: 'סביבון', icon: '🕎' }, { en: 'Dance', hb: 'לרקוד', icon: '💃' },
+            { en: 'Dreidel', hb: 'סביבון', icon: '🌀' }, { en: 'Dance', hb: 'לרקוד', icon: '💃' },
             { en: 'Jump', hb: 'לקפוץ', icon: '🦘' }, { en: 'Stop', hb: 'לעצור', icon: '🛑' },
             { en: 'Party', hb: 'מסיבה', icon: '🎉' }, { en: 'Light', hb: 'אור', icon: '💡' },
             { en: 'Happy birthday', hb: 'יום הולדת שמח', icon: '🎂' }, { en: 'Good morning', hb: 'בוקר טוב', icon: '🌅' }
         ];
 
         let currentIndex = 0;
+        let successCount = 0;
         let currentGameMode = 1; 
         let isProcessing = false;
         let hasSucceeded = false;
         let recognition;
-        let retryTimer;
+        let silenceTimer;
+        let audioCtx;
+
+        const compliments = [
+            "Very Good!",
+            "You are Excellent!",
+            "Amazing job!",
+            "You are a superstar!",
+            "Fantastic!",
+            "Great work!"
+        ];
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
 
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (SpeechRecognition) {
             recognition = new SpeechRecognition();
             recognition.interimResults = true;
-            recognition.continuous = false; // עדיף false כדי לזהות סוף משפט מהר יותר
+            recognition.continuous = false; 
 
             recognition.onstart = () => {
                 isProcessing = true;
                 document.getElementById('mic-button').classList.add('is-listening');
                 document.getElementById('main-card').classList.add('listening-active');
-                clearTimeout(retryTimer);
-                // אם עברו 10 שניות ועדיין מקשיב - להגיד שוב
-                retryTimer = setTimeout(() => {
+                
+                clearTimeout(silenceTimer);
+                silenceTimer = setTimeout(() => {
                     if (isProcessing && !hasSucceeded) {
-                        recognition.stop();
-                        updateCard(); // זה יגיד את המילה שוב ויפתח מיקרופון
+                        recognition.stop(); 
                     }
-                }, 10000);
+                }, 7000); 
             };
 
             recognition.onresult = (event) => {
@@ -127,7 +151,7 @@
                 
                 if (result.includes(target)) {
                     hasSucceeded = true;
-                    clearTimeout(retryTimer);
+                    clearTimeout(silenceTimer);
                     recognition.stop();
                     handleSuccess();
                 }
@@ -137,9 +161,10 @@
                 isProcessing = false;
                 document.getElementById('mic-button').classList.remove('is-listening');
                 document.getElementById('main-card').classList.remove('listening-active');
-                // ה"קסם": אם לא הצלחנו והמיקרופון נסגר לבד - לפתוח שוב מיד!
+                
                 if (!hasSucceeded && document.getElementById('game-screen').style.display === 'flex') {
-                    setTimeout(startListening, 300);
+                    playFailSound(); 
+                    setTimeout(speakCurrentWord, 800); 
                 }
             };
         }
@@ -147,6 +172,8 @@
         function startApp(mode) {
             currentGameMode = mode;
             currentIndex = 0;
+            successCount = 0;
+            updateCounters();
             recognition.lang = (mode === 1) ? 'en-US' : 'he-IL';
             document.getElementById('game-instruction').innerText = (mode === 1) ? "תחזרו אחריי!" : "איך אומרים בעברית?";
             document.getElementById('menu-screen').style.display = 'none';
@@ -160,9 +187,9 @@
         }
 
         function goToMenu() {
-            hasSucceeded = true; // עוצר לופים
+            hasSucceeded = true; 
+            clearTimeout(silenceTimer);
             window.speechSynthesis.cancel();
-            clearTimeout(retryTimer);
             if(isProcessing) recognition.stop();
             document.getElementById('game-screen').style.display = 'none';
             document.getElementById('menu-screen').style.display = 'flex';
@@ -170,25 +197,37 @@
 
         function updateCard() {
             hasSucceeded = false;
-            window.speechSynthesis.cancel();
-            
+            document.getElementById('transcript-text').innerText = "";
             const item = words[currentIndex];
             document.getElementById('display-emoji').innerText = item.icon;
             document.getElementById('display-en').innerText = item.en;
+            updateCounters();
+            speakCurrentWord();
+        }
+
+        function updateCounters() {
             document.getElementById('counter').innerText = `${currentIndex + 1} / ${words.length}`;
-            document.getElementById('transcript-text').innerText = "";
+            document.getElementById('streak-counter').innerText = `הצלחות: ${successCount}`;
+        }
+
+        function speakCurrentWord() {
+            if (hasSucceeded) return;
+            window.speechSynthesis.cancel();
             
-            setTimeout(() => {
-                let textToSay = (currentGameMode === 1) ? item.en : `How do you say ${item.en} in Hebrew?`;
-                const u = new SpeechSynthesisUtterance(textToSay);
-                u.lang = 'en-US';
-                u.rate = 0.8;
-                u.onend = () => setTimeout(startListening, 500);
-                window.speechSynthesis.speak(u);
-            }, 300);
+            const item = words[currentIndex];
+            let textToSay = (currentGameMode === 1) ? item.en : `How do you say ${item.en} in Hebrew?`;
+            
+            const u = new SpeechSynthesisUtterance(textToSay);
+            u.lang = 'en-US';
+            u.rate = 0.8;
+            u.onend = () => {
+                if (!hasSucceeded) startListening();
+            };
+            window.speechSynthesis.speak(u);
         }
 
         function toggleMic() {
+            initAudio(); 
             if (isProcessing) recognition.stop();
             else startListening();
         }
@@ -199,23 +238,66 @@
         }
 
         function handleSuccess() {
+            successCount++;
             confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
             playWinSound();
-            setTimeout(nextWord, 2000);
+            
+            if (successCount % 5 === 0) {
+                setTimeout(giveCompliment, 1000);
+            } else {
+                setTimeout(nextWord, 2000);
+            }
+        }
+
+        function giveCompliment() {
+            window.speechSynthesis.cancel();
+            const randomCompliment = compliments[Math.floor(Math.random() * compliments.length)];
+            const u = new SpeechSynthesisUtterance(randomCompliment);
+            u.lang = 'en-US';
+            u.pitch = 1.2;
+            u.rate = 0.9;
+            u.onend = () => setTimeout(nextWord, 1000);
+            window.speechSynthesis.speak(u);
         }
 
         function playWinSound() {
-            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (!audioCtx) return;
             [523, 659, 783, 1046].forEach((f, i) => {
                 const o = audioCtx.createOscillator();
+                o.type = 'sine';
                 o.frequency.setValueAtTime(f, audioCtx.currentTime + i * 0.1);
-                o.connect(audioCtx.destination);
-                o.start(audioCtx.currentTime + i * 0.1); o.stop(audioCtx.currentTime + i * 0.1 + 0.3);
+                const g = audioCtx.createGain();
+                g.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                o.connect(g); g.connect(audioCtx.destination);
+                o.start(audioCtx.currentTime + i * 0.1); o.stop(audioCtx.currentTime + i * 0.1 + 0.2);
             });
         }
 
-        function nextWord() { currentIndex = (currentIndex + 1) % words.length; updateCard(); }
-        function prevWord() { currentIndex = (currentIndex - 1 + words.length) % words.length; updateCard(); }
+        function playFailSound() {
+            if (!audioCtx) return;
+            const now = audioCtx.currentTime;
+            const playTick = (time, freq) => {
+                const o = audioCtx.createOscillator();
+                o.type = 'sine';
+                o.frequency.setValueAtTime(freq, time);
+                const g = audioCtx.createGain();
+                g.gain.setValueAtTime(0.05, time);
+                g.gain.exponentialRampToValueAtTime(0.001, time + 0.1);
+                o.connect(g); g.connect(audioCtx.destination);
+                o.start(time); o.stop(time + 0.1);
+            }
+            playTick(now, 800);
+            playTick(now + 0.15, 600);
+        }
+
+        function nextWord() { 
+            currentIndex = (currentIndex + 1) % words.length; 
+            updateCard(); 
+        }
+        function prevWord() { 
+            currentIndex = (currentIndex - 1 + words.length) % words.length; 
+            updateCard(); 
+        }
     </script>
 </body>
 </html>
